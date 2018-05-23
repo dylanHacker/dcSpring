@@ -1,7 +1,8 @@
-package com.dylan.servlet;
+package com.dylan.framework.servlet;
 
-import com.dylan.annotation.Controller;
-import com.dylan.annotation.Service;
+import com.dylan.framework.annotation.Autowired;
+import com.dylan.framework.annotation.Controller;
+import com.dylan.framework.annotation.Service;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -11,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -67,6 +69,30 @@ public class DispatcherServlet extends HttpServlet {
     }
 
     private void doAutowired() {
+        if (beanDefinitionMap.isEmpty()){
+            return;
+        }
+        for (Map.Entry<String,Object> entry : beanDefinitionMap.entrySet()){
+            Field[] fields = entry.getValue().getClass().getDeclaredFields();
+            for (Field field : fields){
+                if (!field.isAnnotationPresent(Autowired.class)){
+                    return;
+                }
+
+                Autowired autowired = field.getAnnotation(Autowired.class);
+                String beanName = autowired.value().trim();
+                if ("".equals(beanName)){
+                    beanName = field.getType().getName();
+                }
+                field.setAccessible(true);
+
+                try {
+                    field.set(entry.getValue(),beanDefinitionMap.get(beanName));
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     private void doRegistry() {
@@ -82,7 +108,20 @@ public class DispatcherServlet extends HttpServlet {
                     String beanName = lowerCaseFirst(clazz.getSimpleName());
                     beanDefinitionMap.put(beanName,clazz.newInstance());
                 } else if (clazz.isAnnotationPresent(Service.class)){
+                    Service service = clazz.getAnnotation(Service.class);
+                    String beanName = service.value();
+                    if ("".equals(beanName.trim())){
+                        beanName = clazz.getSimpleName();
+                    }
+                    Object instance = clazz.newInstance();
 
+                    beanDefinitionMap.put(beanName, instance);
+
+                    Class<?>[] interfaces = clazz.getInterfaces();
+
+                    for (Class<?> i : interfaces){
+                        beanDefinitionMap.put(i.getName(),instance);
+                    }
                 } else {
                     continue;
                 }

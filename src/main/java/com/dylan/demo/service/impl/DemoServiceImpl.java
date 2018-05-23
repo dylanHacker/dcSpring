@@ -1,6 +1,6 @@
 package com.dylan.demo.service.impl;
 
-import com.dylan.annotation.Service;
+import com.dylan.framework.annotation.Service;
 import com.dylan.demo.service.api.DemoService;
 
 /**

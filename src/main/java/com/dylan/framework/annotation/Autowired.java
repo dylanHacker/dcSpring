@@ -1,4 +1,4 @@
-package com.dylan.annotation;
+package com.dylan.framework.annotation;
 
 import java.lang.annotation.*;
 
@@ -10,4 +10,5 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface Autowired {
+    String value() default "";
 }

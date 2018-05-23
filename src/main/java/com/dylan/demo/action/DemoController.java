@@ -1,9 +1,9 @@
 package com.dylan.demo.action;
 
-import com.dylan.annotation.Autowired;
-import com.dylan.annotation.Controller;
-import com.dylan.annotation.RequestMapping;
-import com.dylan.annotation.RequestParam;
+import com.dylan.framework.annotation.Autowired;
+import com.dylan.framework.annotation.Controller;
+import com.dylan.framework.annotation.RequestMapping;
+import com.dylan.framework.annotation.RequestParam;
 import com.dylan.demo.service.api.DemoService;
 
 import javax.servlet.http.HttpServletRequest;
